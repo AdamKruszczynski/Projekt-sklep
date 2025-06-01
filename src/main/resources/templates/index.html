@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Strona główna</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/script.js}" defer></script>
+    <style>
+        /* Styl banera */
+        .banner {
+            background: url('/images/baner.png') no-repeat center center;
+            background-size: cover;
+            height: 250px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 50px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .auth-links a {
+            margin-left: 20px;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Sekcja z informacjami */
+        .info-section {
+            display: flex;
+            align-items: center;
+            margin: 40px 0;
+            padding: 0 50px;
+        }
+
+        .info-section img {
+            width: 250px;
+            height: auto;
+            margin-right: 30px;
+        }
+
+        /* Sekcja firm */
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 30px;
+            padding: 20px 50px;
+        }
+
+        .company-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .company-card img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .show-more {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .hidden-row {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <span th:if="${#authorization.expression('hasAuthority(''OWNER'')')}">Witaj właścicielu!</span>
+    <span th:if="${#authorization.expression('hasAuthority(''USER'')')}">Witaj użytkowniku!</span>
+    <div style="float: left;">
+        <a href="/">Moje Logo</a>
+    </div>
+    <div style="float: right;">
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="'Witaj, ' + ${#authentication.name}"></span> |
+            <a href="/logout">Wyloguj</a>
+
+            <th:block th:if="${#authorization.expression('hasAuthority(''OWNER'')')}">
+                | <a href="/owner/dashboard">Panel firmy</a>
+            </th:block>
+            <th:block th:if="${#authorization.expression('hasAuthority(''USER'')')}">
+                | <a href="/cart">Koszyk</a>
+            </th:block>
+        </th:block>
+        <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+            <a href="/login">Zaloguj</a> |
+            <a href="/register">Zarejestruj</a>
+        </th:block>
+    </div>
+</div>
+
+
+<div class="banner">
+    <div class="logo">LOGO FIRMY</div>
+    <div class="auth-links">
+        <a th:href="@{/login}">Zaloguj</a>
+        <a th:href="@{/register}">Zarejestruj</a>
+    </div>
+</div>
+
+<span th:if="${#authorization.expression('hasAuthority(''OWNER'')')}">Witaj właścicielu!</span>
+<span th:if="${#authorization.expression('hasAuthority(''USER'')')}">Witaj użytkowniku!</span>
+
+<div class="info-section">
+    <img src="/images/info1.png" alt="Info">
+    <div>
+        <h2>Dlaczego warto nas wybrać?</h2>
+        <p>Szablonowy tekst o zaletach korzystania z usługi...</p>
+    </div>
+</div>
+
+<div class="info-section">
+    <div>
+        <h2>Gwarancja satysfakcji</h2>
+        <p>Szablonowy opis drugiej zalety naszej platformy...</p>
+    </div>
+    <img src="/images/info2.png" alt="Info">
+</div>
+
+<h2 style="text-align: center;">Firmy partnerskie</h2>
+<div id="companyContainer" class="company-grid">
+    <div th:each="company, stat : ${companies}"
+         th:class="'company-card ' + (${stat.index} &gt;= 9 ? 'hidden-row' : '')">
+        <a th:href="@{'/company/' + ${company.id} + '/products'}">
+            <img th:src="@{/images/company-placeholder.jpg}" alt="Logo firmy"/>
+            <h3 th:text="${company.name}">Nazwa firmy</h3>
+            <p th:text="${company.type}">Typ firmy</p>
+        </a>
+    </div>
+</div>
+
+<button id="showMoreBtn" class="show-more">Pokaż więcej firm</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const btn = document.getElementById("showMoreBtn");
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".hidden-row").forEach(el => {
+                el.style.display = "block";
+            });
+            btn.style.display = "none";
+        });
+    });
+</script>
+
+</body>
+</html>

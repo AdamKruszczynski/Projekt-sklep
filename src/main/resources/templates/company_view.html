@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Firma - [[${company.name}]]</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+  <script>
+        function toggleCategory(id) {
+            const section = document.getElementById(id);
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</head>
+<body>
+<h1 th:text="${company.name}">Nazwa firmy</h1>
+
+<img th:src="@{'/images/' + ${company.photo}}" alt="Logo firmy" style="max-width:300px; max-height:200px;">
+
+<p><strong>Typ:</strong> <span th:text="${company.type}">Branża</span></p>
+<p><strong>Opis:</strong> <span th:text="${company.description}">Opis firmy</span></p>
+<p><strong>Email:</strong> <span th:text="${company.email}">Email</span></p>
+<p><strong>Telefon:</strong> <span th:text="${company.phoneNumber}">Numer</span></p>
+
+<hr>
+
+<h2>Kategorie produktów</h2>
+
+<!-- Przykładowy szablon kategorii -->
+<div>
+  <h3 onclick="toggleCategory('cat1')" style="cursor:pointer;">Elektronika ▼</h3>
+  <div id="cat1" style="display:none;">
+    <!-- Tu będą produkty -->
+    <ul>
+      <li>Produkt 1</li>
+      <li>Produkt 2</li>
+      <li>Produkt 3</li>
+    </ul>
+  </div>
+</div>
+
+<div>
+  <h3 onclick="toggleCategory('cat2')" style="cursor:pointer;">Odzież ▼</h3>
+  <div id="cat2" style="display:none;">
+    <ul>
+      <li>Koszulka</li>
+      <li>Spodnie</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

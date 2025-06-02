@@ -138,7 +138,7 @@
 <div id="companyContainer" class="company-grid">
     <div th:each="company, stat : ${companies}"
          th:class="'company-card ' + (${stat.index} &gt;= 9 ? 'hidden-row' : '')">
-        <a th:href="@{'/company/' + ${company.id} + '/products'}">
+        <a th:href="@{'/companies/' + ${company.id}}">
             <img th:src="@{/images/company-placeholder.jpg}" alt="Logo firmy"/>
             <h3 th:text="${company.name}">Nazwa firmy</h3>
             <p th:text="${company.type}">Typ firmy</p>

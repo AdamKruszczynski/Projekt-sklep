@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${company.name} + ' - Produkty'"></title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<header>
+  <h1 th:text="${company.name}"></h1>
+  <p th:text="${company.description}"></p>
+  <p><strong>Typ:</strong> <span th:text="${company.type}"></span></p>
+  <p><strong>Telefon:</strong> <span th:text="${company.phoneNumber}"></span></p>
+  <p><strong>Email:</strong> <span th:text="${company.email}"></span></p>
+</header>
+
+<section>
+  <h2>Produkty firmy</h2>
+  <div class="product-container">
+    <div class="product" th:each="product : ${products}">
+      <img th:src="@{'/images/' + ${product.image}}" alt="Obraz produktu">
+      <h3 th:text="${product.name}"></h3>
+      <p th:text="${product.description}"></p>
+      <p><strong>Cena:</strong> <span th:text="${product.price} + ' PLN'"></span></p>
+      <a th:href="@{'/product/' + ${product.id}}">Szczegóły</a>
+    </div>
+  </div>
+</section>
+</body>
+</html>

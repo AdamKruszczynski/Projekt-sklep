@@ -23,8 +23,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-//    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL)
-//    private Company company;
+    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL)
+    private Company company;
 
     public enum Role {
         USER,

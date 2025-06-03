@@ -5,8 +5,10 @@ import org.example.entity.User;
 import org.example.repository.CompanyRepository;
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,4 +65,20 @@ public class CompanyService {
 
         return saved;
     }
+
+    public Company getCompanyByCurrentUser(Principal principal) {
+        String username = principal.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono użytkownika: " + username));
+
+        return companyRepository.findByOwner(user)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono firmy dla użytkownika: " + username));
+    }
+
+    public void saveOrUpdateCompany(Company company, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElseThrow();
+        company.setOwner(user);
+        companyRepository.save(company);
+    }
+
 }

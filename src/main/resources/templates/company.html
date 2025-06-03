@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <title th:text="${company.name} + ' - Produkty'"></title>
   <link rel="stylesheet" th:href="@{/style.css}">
+  <script>
+    function toggleCategory(id) {
+        const content = document.getElementById(id);
+        content.style.display = content.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
 </head>
 <body>
 <header>
@@ -15,14 +21,19 @@
 </header>
 
 <section>
-  <h2>Produkty firmy</h2>
-  <div class="product-container">
-    <div class="product" th:each="product : ${products}">
-      <img th:src="@{'/images/' + ${product.image}}" alt="Obraz produktu">
-      <h3 th:text="${product.name}"></h3>
-      <p th:text="${product.description}"></p>
-      <p><strong>Cena:</strong> <span th:text="${product.price} + ' PLN'"></span></p>
-      <a th:href="@{'/product/' + ${product.id}}">Szczegóły</a>
+  <h2>Kategorie produktów</h2>
+  <div th:each="entry : ${categoryProducts}">
+    <div class="category" th:onclick="'toggleCategory(' + ${entry.key.id} + ')'">
+      🗂️ <span th:text="${entry.key.name}">Nazwa kategorii</span>
+    </div>
+    <div class="category-content" th:id="${entry.key.id}" style="display:none;">
+      <ul>
+        <li th:each="product : ${entry.value}">
+          <strong th:text="${product.name}">Nazwa</strong> –
+          <span th:text="${product.description}">Opis</span>,
+          <span th:text="${product.price}">Cena</span> zł
+        </li>
+      </ul>
     </div>
   </div>
 </section>

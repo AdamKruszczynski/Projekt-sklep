@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Panel właściciela</title>
+</head>
+<body>
+
+<h2>Witaj w panelu właściciela!</h2>
+
+<div>
+  <h3>Zarządzaj swoją firmą:</h3>
+  <a th:href="@{/owner/company/form}">Dodaj / Edytuj firmę</a>
+</div>
+
+<div>
+  <h3>Zarządzaj kategoriami:</h3>
+  <a th:href="@{/owner/category/form}">Dodaj nową kategorię</a>
+  <!-- Lista istniejących kategorii z możliwością edycji -->
+  <ul>
+    <li th:each="category : ${categories}">
+      <span th:text="${category.name}"></span> –
+      <a th:href="@{/owner/category/form(id=${category.id})}">Edytuj</a>
+    </li>
+  </ul>
+</div>
+
+<div>
+  <h3>Zarządzaj produktami:</h3>
+  <a th:href="@{/owner/product/form}">Dodaj nowy produkt</a>
+  <!-- Lista istniejących produktów z możliwością edycji -->
+  <ul>
+    <li th:each="product : ${products}">
+      <span th:text="${product.name}"></span> –
+      <a th:href="@{/owner/product/form(id=${product.id})}">Edytuj</a>
+    </li>
+  </ul>
+</div>
+
+</body>
+</html>

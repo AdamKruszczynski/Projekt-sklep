@@ -93,7 +93,7 @@
             <a href="/logout">Wyloguj</a>
 
             <th:block th:if="${#authorization.expression('hasAuthority(''OWNER'')')}">
-                | <a href="/owner/dashboard">Panel firmy</a>
+                | <a href="/owner/panel">Panel firmy</a>
             </th:block>
             <th:block th:if="${#authorization.expression('hasAuthority(''USER'')')}">
                 | <a href="/cart">Koszyk</a>

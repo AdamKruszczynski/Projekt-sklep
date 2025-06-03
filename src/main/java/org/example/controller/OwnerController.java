@@ -31,31 +31,31 @@ public class OwnerController {
     @Autowired
     private CompanyRepository companyRepository;
 
-    @GetMapping("/dashboard")
-    public String dashboard(Model model, Authentication auth) {
-        User user = userRepository.findByUsername(auth.getName()).orElseThrow();
-        Company company = user.getCompany();
-        if (company == null) {
-            company = new Company();
-        }
-        model.addAttribute("company", company);
-        return "owner/dashboard";
-    }
-
-    @PostMapping("/company/save")
-    public String saveCompany(@ModelAttribute("company") Company company, Authentication auth) {
-        User user = userRepository.findByUsername(auth.getName()).orElseThrow();
-        Company existing = user.getCompany();
-
-        if (existing != null) {
-            company.setOwner(user);
-            companyRepository.save(company);
-        }else {
-            company.setOwner(user);
-            companyService.createNewCompanyForUser(company, user);
-
-        }
-
-        return "redirect:/owner/dashboard";
-    }
+//    @GetMapping("/dashboard")
+//    public String dashboard(Model model, Authentication auth) {
+//        User user = userRepository.findByUsername(auth.getName()).orElseThrow();
+//        Company company = user.getCompany();
+//        if (company == null) {
+//            company = new Company();
+//        }
+//        model.addAttribute("company", company);
+//        return "owner/dashboard";
+//    }
+//
+//    @PostMapping("/company/save")
+//    public String saveCompany(@ModelAttribute("company") Company company, Authentication auth) {
+//        User user = userRepository.findByUsername(auth.getName()).orElseThrow();
+//        Company existing = user.getCompany();
+//
+//        if (existing != null) {
+//            company.setOwner(user);
+//            companyRepository.save(company);
+//        }else {
+//            company.setOwner(user);
+//            companyService.createNewCompanyForUser(company, user);
+//
+//        }
+//
+//        return "redirect:/owner/dashboard";
+//    }
 }

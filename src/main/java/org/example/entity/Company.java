@@ -3,6 +3,9 @@ package org.example.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,6 +28,9 @@ public class Company {
     @OneToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private List<Category> categories = new ArrayList<>();
 
     public Company(String name, String description, String phoneNumber, String email) {
         this.name = name;

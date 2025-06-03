@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Panel właściciela</title>
+</head>
+<body>
+<h2>Panel właściciela firmy</h2>
+
+<form th:action="@{/owner/company/save}" th:object="${company}" method="post">
+  <input type="hidden" th:field="*{id}" />
+
+  <label>Nazwa firmy:</label>
+  <input type="text" th:field="*{name}" required /><br/>
+
+  <label>Typ działalności:</label>
+  <input type="text" th:field="*{type}" required /><br/>
+
+  <label>Opis:</label><br/>
+  <textarea th:field="*{description}" required></textarea><br/>
+
+  <label>Telefon kontaktowy:</label>
+  <input type="text" th:field="*{phoneNumber}" required /><br/>
+
+  <label>Email:</label>
+  <input type="email" th:field="*{email}" required /><br/>
+
+  <button type="submit">Zapisz dane firmy</button>
+</form>
+
+</body>
+</html>

@@ -22,10 +22,10 @@
   <input type="text" th:field="*{photoName}" /><br/>
 
   <label>Wartości odżywcze:</label><br/>
-  <textarea th:field="*{nutritionValues}"></textarea> required <br/>
+  <textarea th:field="*{nutrition}" required="required"></textarea><br/>
 
-  <label>Alergeny (opcjonalnie):</label><br/>
-  <textarea th:field="*{allergens}"></textarea><br/>
+  <label>Alergeny:</label><br/>
+  <textarea th:field="*{allergens}" required="required"></textarea><br/>
 
   <label>Kategorie produktu:</label><br/>
   <div th:each="category : ${allCategories}">

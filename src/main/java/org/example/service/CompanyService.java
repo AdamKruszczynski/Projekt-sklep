@@ -66,13 +66,9 @@ public class CompanyService {
         return saved;
     }
 
-    public Company getCompanyByCurrentUser(Principal principal) {
+    public Optional<Company> getCompanyByCurrentUser(Principal principal) {
         String username = principal.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono użytkownika: " + username));
-
-        return companyRepository.findByOwner(user)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono firmy dla użytkownika: " + username));
+        return companyRepository.findByOwner_Username(username);
     }
 
     public void saveOrUpdateCompany(Company company, Principal principal) {

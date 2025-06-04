@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/owner/panel")
@@ -29,11 +30,16 @@ public class OwnerDashboardController {
 
     @GetMapping
     public String showOwnerDashboard(Model model, Principal principal) {
-        Company company = companyService.getCompanyByCurrentUser(principal);
+        Optional<Company> optionalCompany = companyService.getCompanyByCurrentUser(principal);
 
-        model.addAttribute("company", company);
-        model.addAttribute("categories", categoryService.getCategoriesByCompany(company));
-        model.addAttribute("products", productService.getProductsByCompany(company));
+        if (optionalCompany.isPresent()) {
+            Company company = optionalCompany.get();
+            model.addAttribute("company", company);
+            model.addAttribute("categories", categoryService.getCategoriesByCompany(company));
+            model.addAttribute("products", productService.getProductsByCompany(company));
+        } else {
+            model.addAttribute("company", null);
+        }
 
         return "owner/owner_dashboard";
     }

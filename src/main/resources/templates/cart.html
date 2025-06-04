@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Twój koszyk</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+  <!-- CSRF -->
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<h1>Twój koszyk</h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Produkt</th>
+    <th>Cena</th>
+    <th>Ilość</th>
+    <th>Suma</th>
+    <th>Usuń</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="item : ${cartItems}" th:id="'row-' + ${item.product.id}">
+    <td th:text="${item.product.name}">Nazwa</td>
+    <td th:text="${item.product.price}">0.00</td>
+    <td>
+      <button type="button" th:onclick="'changeQuantity(' + ${item.product.id} + ', -1)'">–</button>
+      <span th:id="'quantity-' + ${item.product.id}" th:text="${item.quantity}">1</span>
+      <button type="button" th:onclick="'changeQuantity(' + ${item.product.id} + ', 1)'">+</button>
+    </td>
+    <td th:id="'total-' + ${item.product.id}">
+      <span th:text="${item.product.price * item.quantity}">0.00</span> zł
+    </td>
+    <td>
+      <form method="post" th:action="@{/cart/remove}">
+        <input type="hidden" name="productId" th:value="${item.product.id}" />
+        <button type="submit">🗑️</button>
+      </form>
+    </td>
+  </tr>
+
+  </tbody>
+</table>
+
+<h3>Łączna suma: <span id="totalPrice" th:text="${total}">0.00</span> zł</h3>
+
+<script>
+function changeQuantity(productId, delta) {
+    const quantityElement = document.getElementById('quantity-' + productId);
+    let currentQuantity = parseInt(quantityElement.innerText);
+    const newQuantity = currentQuantity + delta;
+    if (newQuantity < 1) return;
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    fetch('/cart/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            [csrfHeader]: csrfToken
+        },
+        body: `productId=${productId}&quantity=${newQuantity}`
+    })
+    .then(response => {
+        if (response.ok) {
+            quantityElement.innerText = newQuantity;
+
+            // Aktualizacja sumy dla produktu
+            const priceText = document.querySelector('#row-' + productId + ' td:nth-child(2)').innerText;
+            const price = parseFloat(priceText.replace(',', '.'));
+            const total = (price * newQuantity).toFixed(2);
+            document.getElementById('total-' + productId).innerText = total + ' zł';
+
+            // Aktualizacja łącznej sumy
+            updateTotalPrice();
+        } else {
+            alert("Błąd przy aktualizacji ilości");
+        }
+    });
+}
+
+function updateTotalPrice() {
+    let total = 0;
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const cell = row.querySelector('td:nth-child(4)');
+        if (cell) {
+            const text = cell.innerText.replace(' zł', '').replace(',', '.');
+            total += parseFloat(text);
+        }
+    });
+    document.getElementById('totalPrice').innerText = total.toFixed(2);
+}
+</script>
+
+</body>
+</html>

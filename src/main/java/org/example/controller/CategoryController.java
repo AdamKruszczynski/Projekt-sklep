@@ -2,10 +2,8 @@ package org.example.controller;
 
 import org.example.entity.Category;
 import org.example.entity.Company;
-import org.example.repository.CategoryRepository;
 import org.example.service.CategoryService;
 import org.example.service.CompanyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +28,9 @@ public class CategoryController {
                 ? categoryService.getById(id).orElse(new Category())
                 : new Category();
 
-        Company company = companyService.getCompanyByCurrentUser(principal);
+        Company company = companyService.getCompanyByCurrentUser(principal)
+                .orElse(new Company()); // lub rzuć wyjątek, jeśli to krytyczne
+
         category.setCompany(company);
 
         model.addAttribute("category", category);

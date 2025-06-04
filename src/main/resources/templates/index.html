@@ -96,7 +96,7 @@
                 | <a href="/owner/panel">Panel firmy</a>
             </th:block>
             <th:block th:if="${#authorization.expression('hasAuthority(''USER'')')}">
-                | <a href="/cart">Koszyk</a>
+                | <a href="/cart/view">Koszyk</a>
             </th:block>
         </th:block>
         <th:block th:unless="${#authorization.expression('isAuthenticated()')}">

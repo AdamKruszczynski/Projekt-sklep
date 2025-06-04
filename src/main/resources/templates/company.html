@@ -29,13 +29,63 @@
     <div class="category-content" th:id="${entry.key.id}" style="display:none;">
       <ul>
         <li th:each="product : ${entry.value}">
+          <a href="javascript:void(0)"
+             th:attr="data-name=${product.name}, data-description=${product.description}, data-photoName=${product.photoName}, data-allergens=${product.allergens}, data-nutrition=${product.nutrition}"
+             onclick="handleProductClick(this)">
           <strong th:text="${product.name}">Nazwa</strong> –
-          <span th:text="${product.description}">Opis</span>,
-          <span th:text="${product.price}">Cena</span> zł
+            <span th:text="${product.price}">Cena</span> zł
+          </a>
+          <form th:action="@{/cart/add}" method="post">
+            <input type="hidden" name="productId" th:value="${product.id}" />
+            <button type="submit">🛒 Dodaj do koszyka</button>
+          </form>
         </li>
       </ul>
     </div>
   </div>
 </section>
+
+<div id="productModal" class="modal" style="display:none; position: fixed; z-index: 1000; background: rgba(0,0,0,0.6); top: 0; left: 0; width: 100%; height: 100%;">
+  <div class="modal-content" style="background: white; margin: 10% auto; padding: 20px; width: 60%; border-radius: 10px; position: relative;">
+    <span onclick="closeProductModal()" style="position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold;">&times;</span>
+    <h2 id="modalProductName">Nazwa</h2>
+    <img id="modalProductPhoto" src="" alt="Zdjęcie produktu" style="max-width: 100%; height: auto;" />
+    <p><strong>Opis:</strong> <span id="modalProductDescription"></span></p>
+    <p><strong>Alergeny:</strong> <span id="modalProductAllergens"></span></p>
+    <p><strong>Wartości odżywcze:</strong> <span id="modalProductNutrition"></span></p>
+  </div>
+</div>
 </body>
+<script>
+  function showProductModal(name, description, photoName, allergens, nutrition) {
+    document.getElementById("modalProductName").innerText = name;
+    document.getElementById("modalProductDescription").innerText = description || "Brak informacji";
+    document.getElementById("modalProductAllergens").innerText = allergens || "Brak";
+    document.getElementById("modalProductNutrition").innerText = nutrition || "Brak";
+
+    const photoElement = document.getElementById("modalProductPhoto");
+    if (photoName) {
+      photoElement.src = '/images/' + photoName; // Dopasuj ścieżkę jeśli inna
+      photoElement.style.display = 'block';
+    } else {
+      photoElement.style.display = 'none';
+    }
+
+    document.getElementById("productModal").style.display = "block";
+  }
+
+  function closeProductModal() {
+    document.getElementById("productModal").style.display = "none";
+  }
+
+  function handleProductClick(element) {
+    const name = element.getAttribute("data-name");
+    const description = element.getAttribute("data-description");
+    const photoName = element.getAttribute("data-photoName");
+    const allergens = element.getAttribute("data-allergens");
+    const nutrition = element.getAttribute("data-nutrition");
+
+    showProductModal(name, description, photoName, allergens, nutrition);
+  }
+</script>
 </html>

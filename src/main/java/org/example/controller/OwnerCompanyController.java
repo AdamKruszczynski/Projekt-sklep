@@ -23,10 +23,8 @@ public class OwnerCompanyController {
 
     @GetMapping("/form")
     public String showCompanyForm(Principal principal, Model model) {
-        Company company = companyService.getCompanyByCurrentUser(principal);
-        if (company == null) {
-            company = new Company();
-        }
+        Company company = companyService.getCompanyByCurrentUser(principal)
+                .orElse(new Company());
 
         model.addAttribute("company", company);
         return "owner/company_form";

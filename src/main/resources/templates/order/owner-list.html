@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Data</th>
+    <th>Status</th>
+    <th>Powód anulowania</th>
+    <th>Akcje</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="order : ${orders}">
+    <td th:text="${order.id}"></td>
+    <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    <td th:text="${order.status}"></td>
+    <td th:text="${order.cancellationReason}"></td>
+    <td>
+      <form th:action="@{'/order/confirm/' + ${order.id}}" method="post" style="display:inline;">
+        <button type="submit" th:if="${order.status == T(org.example.entity.OrderStatus).NEW}">Potwierdź</button>
+      </form>
+      <a th:href="@{'/order/cancel/' + ${order.id}}" th:if="${order.status == T(org.example.entity.OrderStatus).NEW}">Anuluj</a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

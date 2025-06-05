@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Logowanie</title></head>
+<body>
+<h2>Twoje zamówienia</h2>
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Status</th>
+    <th>Data</th>
+    <th>Kwota</th>
+    <th>Powód anulowania</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="order : ${orders}">
+    <td th:text="${order.id}"></td>
+    <td th:text="${order.status}"></td>
+    <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    <td th:text="${order.total}"></td>
+    <td th:text="${order.cancellationReason != null ? order.cancellationReason : '---'}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

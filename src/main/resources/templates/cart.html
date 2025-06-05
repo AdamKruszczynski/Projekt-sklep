@@ -46,6 +46,10 @@
 
 <h3>Łączna suma: <span id="totalPrice" th:text="${total}">0.00</span> zł</h3>
 
+<form method="post" th:action="@{/order/submit}">
+  <button type="submit">Zamów</button>
+</form>
+
 <script>
 function changeQuantity(productId, delta) {
     const quantityElement = document.getElementById('quantity-' + productId);

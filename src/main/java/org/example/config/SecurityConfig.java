@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2/**", "/logout")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));

@@ -7,6 +7,7 @@ import org.example.repository.CartItemRepository;
 import org.example.repository.ProductRepository;
 import org.example.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -61,6 +62,7 @@ public class CartService {
         return cartItemRepository.findByUser(user);
     }
 
+    @Transactional
     public void clearCart(String username) {
         User user = userRepository.findByUsername(username).orElseThrow();
         cartItemRepository.deleteByUser(user);

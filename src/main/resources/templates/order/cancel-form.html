@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Anuluj zamówienie</title>
+</head>
+
+<body>
+<h2>Anuluj zamówienie #<span th:text="${orderId}"></span></h2>
+
+<form th:action="@{'/order/cancel/' + ${orderId}}" method="post">
+  <label for="reason">Powód anulowania:</label><br>
+  <textarea id="reason" name="reason" rows="4" cols="50" required></textarea><br><br>
+  <button type="submit">Anuluj zamówienie</button>
+</form>
+</body>
+</html>

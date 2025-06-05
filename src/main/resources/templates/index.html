@@ -90,7 +90,9 @@
     <div style="float: right;">
         <th:block th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="'Witaj, ' + ${#authentication.name}"></span> |
-            <a href="/logout">Wyloguj</a>
+            <form action="/logout" method="post">
+                <button type="submit">Wyloguj</button>
+            </form>
 
             <th:block th:if="${#authorization.expression('hasAuthority(''OWNER'')')}">
                 | <a href="/owner/panel">Panel firmy</a>

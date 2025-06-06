@@ -77,6 +77,21 @@
         .hidden-row {
             display: none;
         }
+
+        .notification-bell {
+            font-size: 24px;
+            position: relative;
+        }
+        .notification-count {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            padding: 2px 6px;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+        }
     </style>
 </head>
 <body>
@@ -93,13 +108,23 @@
             <form action="/logout" method="post">
                 <button type="submit">Wyloguj</button>
             </form>
-
             <th:block th:if="${#authorization.expression('hasAuthority(''OWNER'')')}">
                 | <a href="/owner/panel">Panel firmy</a>
             </th:block>
             <th:block th:if="${#authorization.expression('hasAuthority(''USER'')')}">
                 | <a href="/cart/view">Koszyk</a>
             </th:block>
+            <div id="notification-bell" style="position: relative;">
+                <button onclick="toggleDropdown()" style="background: none; border: none; position: relative;">
+                    🔔
+                    <span id="notification-count" style="color: red; font-weight: bold;"></span>
+                </button>
+                <div id="notification-dropdown"
+                     style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; padding: 10px; width: 300px;">
+                    <p><strong>Ostatnie powiadomienia</strong></p>
+                    <ul id="notification-list"></ul>
+                </div>
+            </div>
         </th:block>
         <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
             <a href="/login">Zaloguj</a> |
@@ -160,6 +185,46 @@
             btn.style.display = "none";
         });
     });
+
+    function toggleDropdown() {
+    const dropdown = document.getElementById('notification-dropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+
+    if (dropdown.style.display === 'block') {
+        fetch('/notifications/latest')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('notification-list');
+                list.innerHTML = '';
+                const ids = [];
+                data.forEach(notification => {
+                    ids.push(notification.id);
+                    const item = document.createElement('li');
+                    item.innerText = notification.message;
+                    list.appendChild(item);
+                });
+                // Oznacz jako przeczytane
+                if (ids.length > 0) {
+                    fetch('/notifications/mark-read', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(ids)
+                    }).then(() => updateNotificationCount());
+                }
+            });
+        }
+    }
+
+    function updateNotificationCount() {
+        fetch('/notifications/latest')
+            .then(response => response.json())
+            .then(data => {
+                const count = data.length;
+                document.getElementById('notification-count').innerText = count > 0 ? count : '';
+            });
+    }
+
+document.addEventListener('DOMContentLoaded', updateNotificationCount);
 </script>
 
 </body>

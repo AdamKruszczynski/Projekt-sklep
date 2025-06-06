@@ -7,7 +7,9 @@ import org.example.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -16,12 +18,14 @@ public class OrderService {
     private final CartService cartService;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final NotificationService notificationService;
 
-    public OrderService(OrderRepository orderRepository, CartService cartService, UserRepository userRepository, CompanyRepository companyRepository) {
+    public OrderService(OrderRepository orderRepository, CartService cartService, UserRepository userRepository, CompanyRepository companyRepository, NotificationService notificationService) {
         this.orderRepository = orderRepository;
         this.cartService = cartService;
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -47,6 +51,26 @@ public class OrderService {
         orderRepository.save(order);
         cartService.clearCart(username);
 
+        notificationService.sendNotification(
+                username,
+                "Zamówienie #" + order.getId() + " zostało złożone i oczekuje na potwierdzenie.",
+                NotificationType.NEW_ORDER_SUBMITTED
+        );
+
+        Set<User> ownersToNotify = new HashSet<>();
+        for (CartItem item : cartItems) {
+            User owner = item.getProduct().getCompany().getOwner();
+            ownersToNotify.add(owner);
+        }
+
+        for (User owner : ownersToNotify) {
+            notificationService.sendNotification(
+                    owner.getUsername(),
+                    "Otrzymałeś nowe zamówienie #" + order.getId() + " od użytkownika " + username + ".",
+                    NotificationType.NEW_ORDER_SUBMITTED
+            );
+        }
+
         return order;
     }
 
@@ -59,6 +83,12 @@ public class OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow();
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
+
+        notificationService.sendNotification(
+                order.getUser().getUsername(),
+                "Twoje zamówienie #" + order.getId() + " zostało potwierdzone.",
+                NotificationType.ORDER_CONFIRMED
+        );
     }
 
     @Transactional
@@ -67,6 +97,12 @@ public class OrderService {
         order.setStatus(OrderStatus.CANCELED);
         order.setCancellationReason(reason);
         orderRepository.save(order);
+
+        notificationService.sendNotification(
+                order.getUser().getUsername(),
+                "Twoje zamówienie #" + order.getId() + " zostało anulowane. Powód: " + reason,
+                NotificationType.ORDER_CANCELED
+        );
     }
 
     public List<Order> getOrdersForOwner(String ownerUsername) {

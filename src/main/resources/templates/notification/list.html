@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Powiadomienia</title></head>
+<body>
+<h2>Twoje powiadomienia</h2>
+<ul>
+  <li th:each="notification : ${notifications}">
+    <span th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd HH:mm')}"></span> -
+    <span th:text="${notification.message}"></span>
+  </li>
+</ul>
+</body>
+</html>

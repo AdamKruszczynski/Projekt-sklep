@@ -31,16 +31,6 @@ public class NotificationService {
         return notificationRepository.countByUserUsernameAndReadFalse(username);
     }
 
-    public void markAllAsRead(String username) {
-        List<Notification> unread = notificationRepository.findByUserUsernameOrderByCreatedAtDesc(username)
-                .stream()
-                .filter(n -> !n.isRead())
-                .toList();
-
-        unread.forEach(n -> n.setRead(true));
-        notificationRepository.saveAll(unread);
-    }
-
     public void sendNotification(String username, String message, NotificationType type) {
         User user = userRepository.findByUsername(username).orElseThrow();
         Notification notification = Notification.builder()
@@ -64,6 +54,22 @@ public class NotificationService {
             notification.setRead(true);
         }
         notificationRepository.saveAll(notifications);
+    }
+
+    public long getUnreadCount(String username) {
+        return notificationRepository.countByUserUsernameAndReadFalse(username);
+    }
+
+    public List<Notification> getUserUnreadNotifications(String username) {
+        return notificationRepository.findByUserUsernameAndReadFalseOrderByCreatedAtDesc(username);
+    }
+
+    public void markAllAsRead(String username) {
+        List<Notification> unread = notificationRepository.findByUserUsernameAndReadFalse(username);
+        for (Notification n : unread) {
+            n.setRead(true);
+        }
+        notificationRepository.saveAll(unread);
     }
 
 }

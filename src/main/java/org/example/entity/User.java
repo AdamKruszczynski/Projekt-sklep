@@ -29,6 +29,7 @@ public class User {
     public enum Role {
         USER,
         OWNER,
-        ADMIN
+        ADMIN,
+        MODERATOR
     }
 }

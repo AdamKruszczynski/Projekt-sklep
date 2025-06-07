@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Strona główna</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<!--    <link rel="stylesheet" th:href="@{/css/style.css}">-->
     <script th:src="@{/js/script.js}" defer></script>
     <style>
         /* Styl banera */
@@ -115,7 +117,7 @@
                 | <a href="/cart/view">Koszyk</a>
             </th:block>
             <div id="notification-bell" style="position: relative;">
-                <button onclick="toggleDropdown()" style="background: none; border: none; position: relative;">
+                <button id="notification-toggle" onclick="toggleDropdown()" style="background: none; border: none; position: relative;">
                     🔔
                     <span id="notification-count" style="color: red; font-weight: bold;"></span>
                 </button>
@@ -123,6 +125,7 @@
                      style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; padding: 10px; width: 300px;">
                     <p><strong>Ostatnie powiadomienia</strong></p>
                     <ul id="notification-list"></ul>
+                    <button id="markAllReadButton" onclick="markAllNotificationsAsRead()">Oznacz wszystkie jako przeczytane</button>
                 </div>
             </div>
         </th:block>
@@ -176,18 +179,34 @@
 <button id="showMoreBtn" class="show-more">Pokaż więcej firm</button>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const btn = document.getElementById("showMoreBtn");
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Pokaż ukryte wiersze firm (przycisk "Pokaż więcej")
+    const btn = document.getElementById("showMoreBtn");
+    if (btn) {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".hidden-row").forEach(el => {
                 el.style.display = "block";
             });
             btn.style.display = "none";
         });
-    });
+    }
 
-    function toggleDropdown() {
+    // Obsługa dzwoneczka
+    const bell = document.getElementById('notification-bell');
+    if (bell) {
+        bell.addEventListener('click', toggleDropdown);
+    }
+
+    // Odśwież licznik nieprzeczytanych na start
+    updateNotificationCount();
+});
+
+function toggleDropdown() {
+    console.log("Kliknięto dzwoneczek");
     const dropdown = document.getElementById('notification-dropdown');
+    if (!dropdown) return;
+
     dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
 
     if (dropdown.style.display === 'block') {
@@ -196,35 +215,77 @@
             .then(data => {
                 const list = document.getElementById('notification-list');
                 list.innerHTML = '';
-                const ids = [];
+
                 data.forEach(notification => {
-                    ids.push(notification.id);
                     const item = document.createElement('li');
                     item.innerText = notification.message;
                     list.appendChild(item);
                 });
-                // Oznacz jako przeczytane
-                if (ids.length > 0) {
-                    fetch('/notifications/mark-read', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(ids)
-                    }).then(() => updateNotificationCount());
-                }
+
+                // Przycisk: Oznacz wszystkie jako przeczytane
+                const markAllBtn = document.createElement('button');
+                markAllBtn.innerText = 'Oznacz wszystkie jako przeczytane';
+                markAllBtn.style.marginTop = '10px';
+                markAllBtn.style.background = '#007bff';
+                markAllBtn.style.color = 'white';
+                markAllBtn.style.border = 'none';
+                markAllBtn.style.padding = '5px 10px';
+                markAllBtn.style.cursor = 'pointer';
+
+                markAllBtn.addEventListener('click', markAllNotificationsAsRead);
+                list.appendChild(markAllBtn);
             });
+    }
+}
+
+function markAllNotificationsAsRead() {
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    fetch('/notifications/mark-all-read', {
+        method: 'POST',
+         headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            [csrfHeader]: csrfToken
         }
+    }).then(() => {
+        updateNotificationCount();
+
+        const dropdown = document.getElementById('notification-dropdown');
+        if (dropdown) dropdown.style.display = 'none';
+    });
+}
+
+function updateNotificationCount() {
+    fetch('/notifications/unread-count')
+        .then(response => response.json())
+        .then(count => {
+            const countElement = document.getElementById('notification-count');
+            if (countElement) {
+                countElement.innerText = count > 0 ? count : '';
+            }
+        });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById('notification-toggle');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleDropdown);
     }
 
-    function updateNotificationCount() {
-        fetch('/notifications/latest')
-            .then(response => response.json())
-            .then(data => {
-                const count = data.length;
-                document.getElementById('notification-count').innerText = count > 0 ? count : '';
-            });
-    }
+    updateNotificationCount(); // ← żeby licznik odświeżał się na starcie
+});
 
-document.addEventListener('DOMContentLoaded', updateNotificationCount);
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('notification-dropdown');
+    const toggleBtn = document.getElementById('notification-toggle');
+
+    if (!dropdown || !toggleBtn) return;
+
+    if (!dropdown.contains(event.target) && !toggleBtn.contains(event.target)) {
+        dropdown.style.display = 'none';
+    }
+});
 </script>
 
 </body>

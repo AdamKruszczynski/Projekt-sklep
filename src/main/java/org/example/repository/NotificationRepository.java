@@ -15,4 +15,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     @Query("SELECT n FROM Notification n WHERE n.user.username = :username AND n.read = false ORDER BY n.createdAt DESC")
     List<Notification> findTopUnreadByUsername(@Param("username") String username, Pageable pageable);
+
+    List<Notification> findByUserUsernameAndReadFalseOrderByCreatedAtDesc(String username);
+
+    List<Notification> findByUserUsernameAndReadFalse(String username);
 }

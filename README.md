@@ -1,4 +1,4 @@
-# Spring Boot E-Commerce Platform
+# Spring Boot E-Commerce Platform (Projekt w trakcie rozwoju)
 
 ## 🛠️ Technologie
 

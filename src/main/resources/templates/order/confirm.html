@@ -6,7 +6,7 @@
 <body>
 <h2>Twoje zamówienie zostało złożone!</h2>
 <p>Numer zamówienia: <span th:text="${order.id}">123</span></p>
-<p>Data: <span th:text="${order.createdAt}">data</span></p>
+<p>Data: <span th:text="${order.pickupTime}">data</span></p>
 <p>Status: <span th:text="${order.status}">NOWE</span></p>
 <p>Łączna kwota: <span th:text="${total}">0.00</span> zł</p>
 <a th:href="@{/order/history}">Przejdź do historii zamówień</a>

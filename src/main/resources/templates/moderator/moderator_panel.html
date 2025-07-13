@@ -1,30 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Panel właściciela</title>
+  <title>Panel moderatora</title>
 </head>
 <body>
-
-<h2>Witaj w panelu właściciela!</h2>
-
-<div>
-  <h3>Zarządzaj swoją firmą:</h3>
-  <a th:href="@{/owner/company/form}">Dodaj / Edytuj firmę</a>
-</div>
-
-<div>
-  <h3>Zarządzaj moderatorami:</h3>
-  <a th:href="@{/owner/moderator/form}">Dodaj / Edytuj moderatorów</a>
-</div>
-
 <div>
   <h3>Zarządzaj kategoriami:</h3>
-  <a th:href="@{/owner/category/form}">Dodaj nową kategorię</a>
+  <a th:href="@{/moderator/category/form}">Dodaj nową kategorię</a>
 
   <ul>
     <li th:each="category : ${categories}">
       <span th:text="${category.name}"></span> –
-      <a th:href="@{/owner/category/form(id=${category.id})}">Edytuj</a>
+      <a th:href="@{/moderator/category/form(id=${category.id})}">Edytuj</a>
     </li>
   </ul>
 </div>
@@ -48,3 +35,4 @@
 
 </body>
 </html>
+

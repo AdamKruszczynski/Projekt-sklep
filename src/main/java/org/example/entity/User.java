@@ -23,8 +23,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "company_id")
     private Company company;
+
+    @Column(nullable = false)
+    private boolean enabled = true;
 
     public enum Role {
         USER,

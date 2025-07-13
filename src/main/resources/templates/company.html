@@ -21,6 +21,30 @@
 </header>
 
 <section>
+  <form method="get" th:action="@{'/companies/' + ${company.id}}">
+    <label>Cena od:</label>
+    <input type="number" name="priceMin" step="0.01" th:value="${priceMin}" />
+    <label>do:</label>
+    <input type="number" name="priceMax" step="0.01" th:value="${priceMax}" />
+
+    <label>Sortuj:</label>
+    <select name="sortBy">
+      <option value="">-- Brak --</option>
+      <option value="priceAsc" th:selected="${sortBy == 'priceAsc'}">Cena rosnąco</option>
+      <option value="priceDesc" th:selected="${sortBy == 'priceDesc'}">Cena malejąco</option>
+    </select>
+
+    <label>Unikaj alergenów:</label><br/>
+    <label><input type="checkbox" name="excludedAllergens" value="gluten"
+                  th:checked="${excludedAllergens.contains('gluten')}"/> Gluten</label>
+    <label><input type="checkbox" name="excludedAllergens" value="laktoza"
+                  th:checked="${excludedAllergens.contains('laktoza')}"/> Laktoza</label>
+    <label><input type="checkbox" name="excludedAllergens" value="jaja"
+                  th:checked="${excludedAllergens.contains('jaja')}"/> Jaja</label>
+
+    <button type="submit">Filtruj</button>
+  </form>
+
   <h2>Kategorie produktów</h2>
   <div th:each="entry : ${categoryProducts}">
     <div class="category" th:onclick="'toggleCategory(' + ${entry.key.id} + ')'">
@@ -49,43 +73,89 @@
   <div class="modal-content" style="background: white; margin: 10% auto; padding: 20px; width: 60%; border-radius: 10px; position: relative;">
     <span onclick="closeProductModal()" style="position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold;">&times;</span>
     <h2 id="modalProductName">Nazwa</h2>
-    <img id="modalProductPhoto" src="" alt="Zdjęcie produktu" style="max-width: 100%; height: auto;" />
+    <img id="modalProductPhoto" src="" alt="Zdjęcie produktu" style="max-width: 50px; max-height: 50px;" />
     <p><strong>Opis:</strong> <span id="modalProductDescription"></span></p>
     <p><strong>Alergeny:</strong> <span id="modalProductAllergens"></span></p>
     <p><strong>Wartości odżywcze:</strong> <span id="modalProductNutrition"></span></p>
   </div>
 </div>
+
+<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+<h2>Opinie</h2>
+<div th:each="review : ${reviews}">
+  <p><strong th:text="${review.user.username}">Autor</strong>: <span th:text="${review.content}">Treść</span></p>
+  <p>Ocena: <span th:text="${review.rating}">5</span>/5</p>
+
+  <form th:action="@{/reviews/{id}/vote(id=${review.id})}" method="post" th:if="${isLoggedIn}" style="display:inline;">
+    <input type="hidden" name="value" value="1"/>
+  </form>
+
+  <form th:action="@{/reviews/{id}/vote(id=${review.id})}" method="post" th:if="${isLoggedIn}" style="display:inline;">
+    <input type="hidden" name="value" value="-1"/>
+  </form>
+</div>
+
+<div th:if="${isLoggedIn}">
+  <h3>Dodaj opinię</h3>
+  <form th:action="@{'/companies/' + ${company.id} + '/add-review'}"
+        th:object="${newReview}" method="post">
+
+    <label th:for="'rating'">Ocena (1-5):</label>
+    <input type="number" min="1" max="5" th:field="*{rating}" th:id="'rating'" required/><br/>
+
+    <label th:for="'content'">Treść opinii:</label><br/>
+    <textarea th:field="*{content}" th:id="'content'" rows="4" cols="50" required></textarea><br/>
+
+    <button type="submit">Dodaj opinię</button>
+  </form>
+</div>
+<div th:if="${!isLoggedIn}">
+  <p>Aby dodać opinię, <a th:href="@{/login}">zaloguj się</a>.</p>
+</div>
+
+<div th:if="${param.reviewAdded}">
+  <p style="color: green;">Dziękujemy za opinię!</p>
+</div>
+
+<div th:if="${param.reviewExists}">
+  <p style="color: red;">Już dodałeś opinię do tej firmy.</p>
+</div>
+
 </body>
 <script>
-  function showProductModal(name, description, photoName, allergens, nutrition) {
-    document.getElementById("modalProductName").innerText = name;
-    document.getElementById("modalProductDescription").innerText = description || "Brak informacji";
-    document.getElementById("modalProductAllergens").innerText = allergens || "Brak";
-    document.getElementById("modalProductNutrition").innerText = nutrition || "Brak";
+function showProductModal(name, description, photoName, allergens, nutrition) {
+  document.getElementById("modalProductName").innerText = name;
+  document.getElementById("modalProductDescription").innerText = description || "Brak informacji";
+  document.getElementById("modalProductAllergens").innerText = allergens || "Brak";
+  document.getElementById("modalProductNutrition").innerText = nutrition || "Brak";
 
-    const photoElement = document.getElementById("modalProductPhoto");
-    if (photoName) {
-      photoElement.src = '/images/' + photoName; // Dopasuj ścieżkę jeśli inna
-      photoElement.style.display = 'block';
-    } else {
-      photoElement.style.display = 'none';
-    }
+  const photoElement = document.getElementById("modalProductPhoto");
 
-    document.getElementById("productModal").style.display = "block";
+  if (photoName) {
+    // Użyj miniatury Google Drive (działa w <img>)
+    photoElement.src = 'https://drive.google.com/thumbnail?id=' + photoName + '&sz=w1000';
+    photoElement.style.display = 'block';
+  } else {
+    photoElement.style.display = 'none';
   }
 
-  function closeProductModal() {
-    document.getElementById("productModal").style.display = "none";
-  }
+  document.getElementById("productModal").style.display = "block";
+}
 
-  function handleProductClick(element) {
-    const name = element.getAttribute("data-name");
-    const description = element.getAttribute("data-description");
-    const photoName = element.getAttribute("data-photoName");
-    const allergens = element.getAttribute("data-allergens");
-    const nutrition = element.getAttribute("data-nutrition");
+function closeProductModal() {
+  document.getElementById("productModal").style.display = "none";
+}
 
-    showProductModal(name, description, photoName, allergens, nutrition);
-  }
+function handleProductClick(element) {
+  const name = element.getAttribute("data-name");
+  const description = element.getAttribute("data-description");
+  const photoName = element.getAttribute("data-photoName");  // zawiera Google Drive ID
+  const allergens = element.getAttribute("data-allergens");
+  const nutrition = element.getAttribute("data-nutrition");
+
+  showProductModal(name, description, photoName, allergens, nutrition);
+}
+
 </script>
 </html>

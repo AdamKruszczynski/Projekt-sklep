@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Edycja konta</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<h2>Edycja danych konta</h2>
+
+<form th:action="@{/user/edit}" th:object="${user}" method="post">
+  <label>Email:</label>
+  <input type="email" th:field="*{email}" required /><br/>
+
+  <label>Numer telefonu:</label>
+  <input type="text" th:field="*{phoneNumber}" /><br/>
+
+  <button type="submit">Zapisz zmiany</button>
+</form>
+
+<div th:if="${message}">
+  <p th:text="${message}" style="color: green;"></p>
+</div>
+
+</body>
+</html>

@@ -7,6 +7,8 @@ import org.example.repository.CompanyRepository;
 import org.example.repository.ProductRepository;
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -51,4 +53,13 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    public List<Product> getProductsByCompany() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username).orElseThrow();
+        Company company = user.getCompany();
+
+        return productRepository.findByCompany(company);
+    }
 }

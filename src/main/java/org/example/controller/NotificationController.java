@@ -43,7 +43,6 @@ public class NotificationController {
         return notificationService.getLatestUnreadNotifications(username, 999);
     }
 
-
     @PostMapping("/mark-read")
     @ResponseBody
     public void markNotificationsAsRead(@RequestBody List<Long> notificationIds) {

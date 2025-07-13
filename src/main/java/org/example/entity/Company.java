@@ -29,8 +29,14 @@ public class Company {
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @OneToMany(mappedBy = "company")
+    private List<User> employees;
+
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<Category> categories = new ArrayList<>();
+
+    @Column(nullable = false)
+    private boolean active = true;
 
     public Company(String name, String description, String phoneNumber, String email) {
         this.name = name;

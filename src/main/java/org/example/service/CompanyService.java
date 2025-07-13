@@ -76,4 +76,10 @@ public class CompanyService {
         companyRepository.save(company);
     }
 
+    public void toggleCompanyActive(Long companyId) {
+        Company company = companyRepository.findById(companyId).orElseThrow();
+        company.setActive(!company.isActive());
+        companyRepository.save(company);
+    }
+
 }

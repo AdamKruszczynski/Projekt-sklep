@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Panel administratora</title>
+</head>
+<body>
+<h1>Panel administratora</h1>
+
+<h2>Użytkownicy</h2>
+<table>
+  <tr>
+    <th>ID</th><th>Email</th><th>Rola</th><th>Akcja</th>
+  </tr>
+  <tr th:each="user : ${users}">
+    <td th:text="${user.id}"></td>
+    <td th:text="${user.email}"></td>
+    <td th:text="${user.role}"></td>
+    <td>
+      <!-- Zmiana roli -->
+      <form th:action="@{/admin/change-role}" method="post" style="display:inline-block;">
+        <input type="hidden" name="userId" th:value="${user.id}" />
+        <select name="newRole">
+          <option value="USER">USER</option>
+          <option value="OWNER">OWNER</option>
+          <option value="MODERATOR">MODERATOR</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+        <button type="submit">Zmień</button>
+      </form>
+
+      <!-- Blokowanie/odblokowanie -->
+      <form th:action="@{'/admin/users/' + ${user.id} + '/toggle-enabled'}" method="post" style="display:inline-block;">
+        <button type="submit"
+                th:text="${user.enabled} ? 'Zablokuj' : 'Odblokuj'"
+                th:class="${user.enabled} ? 'btn btn-warning' : 'btn btn-success'"></button>
+      </form>
+
+      <!-- Usuwanie -->
+      <form th:action="@{'/admin/users/' + ${user.id} + '/delete'}" method="post"
+            onsubmit="return confirm('Czy na pewno chcesz usunąć użytkownika?');"
+            style="display:inline-block;">
+        <button type="submit" class="btn btn-danger">Usuń</button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+
+<h2>Firmy</h2>
+<table>
+  <tr>
+    <th>ID</th><th>Nazwa</th><th>Właściciel</th><th>Status</th><th>Akcja</th>
+  </tr>
+  <tr th:each="company : ${companies}">
+    <td th:text="${company.id}"></td>
+    <td th:text="${company.name}"></td>
+    <td th:text="${company.owner.email}"></td>
+    <td th:text="${company.active ? 'Aktywna' : 'Ukryta'}"></td>
+    <td>
+      <form th:action="@{/admin/toggle-company}" method="post">
+        <input type="hidden" name="companyId" th:value="${company.id}" />
+        <button type="submit" th:text="${company.active ? 'Ukryj' : 'Aktywuj'}"></button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

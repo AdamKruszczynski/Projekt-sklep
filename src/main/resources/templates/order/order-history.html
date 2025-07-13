@@ -17,7 +17,7 @@
   <tr th:each="order : ${orders}">
     <td th:text="${order.id}"></td>
     <td th:text="${order.status}"></td>
-    <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    <td th:text="${#temporals.format(order.pickupTime, 'yyyy-MM-dd HH:mm')}"></td>
     <td th:text="${order.total}"></td>
     <td th:text="${order.cancellationReason != null ? order.cancellationReason : '---'}"></td>
   </tr>

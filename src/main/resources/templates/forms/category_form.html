@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Dodaj lub edytuj kategorię</title>
+</head>
+<body>
+<h2>Formularz kategorii</h2>
+
+<form th:if="${#authorization.expression('hasAuthority(''OWNER'')')}"
+      th:action="@{/owner/category/save}" th:object="${category}" method="post">
+  <input type="hidden" th:field="*{id}" />
+
+  <label>Nazwa kategorii:</label>
+  <input type="text" th:field="*{name}" required /><br/>
+
+  <input type="hidden" th:field="*{company.id}" />
+
+  <button type="submit">Zapisz kategorię</button>
+</form>
+
+<form th:if="${#authorization.expression('hasAuthority(''MODERATOR'')')}"
+      th:action="@{/moderator/category/save}" th:object="${category}" method="post">
+  <input type="hidden" th:field="*{id}" />
+
+  <label>Nazwa kategorii:</label>
+  <input type="text" th:field="*{name}" required /><br/>
+
+  <input type="hidden" th:field="*{company.id}" />
+
+  <button type="submit">Zapisz kategorię</button>
+</form>
+
+</body>
+</html>

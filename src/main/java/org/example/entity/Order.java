@@ -28,16 +28,26 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     private String cancellationReason;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "pickup_time")
+    private LocalDateTime pickupTime;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     public Double getTotal(){
         return items.stream()
                 .mapToDouble(item -> item.getProduct().getPrice().doubleValue() * item.getQuantity())
                 .sum();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 }

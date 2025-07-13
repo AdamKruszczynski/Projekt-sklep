@@ -24,6 +24,8 @@ public class Product {
     private String photoName;
     private String nutrition;
     private String allergens;
+    private String ingredients;
+
 
     @ManyToMany
     @JoinTable(

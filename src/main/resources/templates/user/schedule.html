@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Terminarz</title>
+  <style>
+        .modal { display: none; position: fixed; top: 20%; left: 25%; width: 50%; background: white; border: 1px solid #ccc; padding: 20px; z-index: 1000; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+    </style>
+</head>
+<body>
+<h2>Twój terminarz zamówień</h2>
+
+<div th:each="entry : ${groupedOrders}">
+  <h3 th:text="${entry.key}"></h3>
+  <ul>
+    <li th:each="order : ${entry.value}" style="margin-bottom: 8px;">
+      <!-- godzina odbioru po lewej -->
+      <span th:text="${#temporals.format(order.pickupTime, 'HH:mm')}" style="display: inline-block; width: 60px; font-weight: bold;"></span>
+
+      <!-- przycisk otwierający popup -->
+      <a href="#" th:text="'Zamówienie #' + ${order.id}"
+         th:attr="onclick=${'showModal_' + order.id + '()'}"></a>
+
+      <!-- Modal + overlay + skrypt (bez zmian) -->
+      <div class="modal-overlay" th:attr="id=${'overlay_' + order.id}" onclick="hideModal([[${order.id}]])"></div>
+      <div class="modal" th:attr="id=${'modal_' + order.id}">
+        <h3 th:text="'Zamówienie #' + ${order.id}"></h3>
+        <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
+        <p><strong>Data odbioru:</strong> <span th:text="${#temporals.format(order.pickupTime, 'yyyy-MM-dd HH:mm')}"></span></p>
+
+        <p><strong>Produkty:</strong></p>
+        <ul>
+          <li th:each="item : ${order.items}">
+            <span th:text="${item.product.name}"></span> –
+            <span th:text="${item.quantity}"></span> szt.
+          </li>
+        </ul>
+        <button th:attr="onclick=${'hideModal(' + order.id + ')'}">Zamknij</button>
+      </div>
+
+      <script th:inline="javascript">
+        function showModal_[[${order.id}]]() {
+            document.getElementById("overlay_[[${order.id}]]").style.display = "block";
+            document.getElementById("modal_[[${order.id}]]").style.display = "block";
+        }
+        function hideModal(id) {
+            document.getElementById("overlay_" + id).style.display = "none";
+            document.getElementById("modal_" + id).style.display = "none";
+        }
+    </script>
+    </li>
+
+  </ul>
+</div>
+</body>
+</html>

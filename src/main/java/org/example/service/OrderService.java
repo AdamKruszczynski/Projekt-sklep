@@ -4,13 +4,16 @@ import org.example.entity.*;
 import org.example.repository.CompanyRepository;
 import org.example.repository.OrderRepository;
 import org.example.repository.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
-
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.TreeMap;
 
 @Service
 public class OrderService {
@@ -29,16 +32,27 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createOrder(String username) {
+    public Order createOrder(String username, LocalDateTime createdAt) {
         User user = userRepository.findByUsername(username).orElseThrow();
         List<CartItem> cartItems = cartService.getCartItems(username);
+
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Koszyk jest pusty");
+        }
+
+        Company company = cartItems.get(0).getProduct().getCompany();
+        boolean allFromSameCompany = cartItems.stream()
+                .allMatch(item -> item.getProduct().getCompany().getId().equals(company.getId()));
+
+        if (!allFromSameCompany) {
+            throw new RuntimeException("Można złożyć zamówienie tylko z jednej firmy na raz.");
+        }
 
         Order order = new Order();
         order.setUser(user);
         order.setStatus(OrderStatus.NEW);
-
-        Company company = cartItems.get(0).getProduct().getCompany();
-        order.setCompany(company); //todo zabezpieczenie aby można było zmówić tylko z jednej firmy na raz
+        order.setCompany(company);
+        order.setPickupTime(createdAt);
 
         for (CartItem cartItem : cartItems) {
             OrderItem item = new OrderItem();
@@ -57,16 +71,18 @@ public class OrderService {
                 NotificationType.NEW_ORDER_SUBMITTED
         );
 
-        Set<User> ownersToNotify = new HashSet<>();
-        for (CartItem item : cartItems) {
-            User owner = item.getProduct().getCompany().getOwner();
-            ownersToNotify.add(owner);
-        }
+        User owner = company.getOwner();
+        notificationService.sendNotification(
+                owner.getUsername(),
+                "Otrzymałeś nowe zamówienie #" + order.getId() + " od użytkownika " + username + ".",
+                NotificationType.NEW_ORDER_SUBMITTED
+        );
 
-        for (User owner : ownersToNotify) {
+        List<User> moderators = userRepository.findByCompanyAndRole(company, User.Role.MODERATOR);
+        for (User moderator : moderators) {
             notificationService.sendNotification(
-                    owner.getUsername(),
-                    "Otrzymałeś nowe zamówienie #" + order.getId() + " od użytkownika " + username + ".",
+                    moderator.getUsername(),
+                    "Twoja firma otrzymała nowe zamówienie #" + order.getId() + " od użytkownika " + username + ".",
                     NotificationType.NEW_ORDER_SUBMITTED
             );
         }
@@ -105,9 +121,46 @@ public class OrderService {
         );
     }
 
-    public List<Order> getOrdersForOwner(String ownerUsername) {
-        User owner = userRepository.findByUsername(ownerUsername).orElseThrow();
-        Company company = companyRepository.findByOwner(owner).orElseThrow();
-        return orderRepository.findByCompany(company);
+    public List<Order> getOrdersForCompany(String name) {
+        User user = userRepository.findByUsername(name).orElseThrow();
+        if (user.getRole() == User.Role.OWNER){
+            Company company = companyRepository.findByOwner(user).orElseThrow();
+            return orderRepository.findByCompany(company);
+        } else if (user.getRole() == User.Role.MODERATOR) {
+            Company company = companyRepository.findById(user.getCompany().getId()).orElseThrow();
+            return orderRepository.findByCompany(company);
+        }
+        throw new RuntimeException("Access denied: user is neither OWNER nor MODERATOR");
     }
+
+    public Map<LocalDate, List<Order>> getUpcomingOrdersGroupedByDate(String username) {
+        List<Order> orders = orderRepository
+                .findByUser_UsernameAndPickupTimeAfterOrderByPickupTime(username, LocalDateTime.now());
+
+        return orders.stream()
+                .collect(Collectors.groupingBy(order -> order.getPickupTime().toLocalDate(),
+                        TreeMap::new,
+                        Collectors.toList()));
+    }
+
+    public Map<LocalDate, List<Order>> getUpcomingOrdersForCompanyGrouped(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono użytkownika"));
+
+        Company company = user.getCompany();
+        if (company == null) {
+            throw new IllegalStateException("Użytkownik nie ma przypisanej firmy");
+        }
+
+        List<Order> orders = orderRepository
+                .findByCompanyAndPickupTimeAfterOrderByPickupTime(company, LocalDateTime.now());
+
+        return orders.stream()
+                .collect(Collectors.groupingBy(
+                        o -> o.getPickupTime().toLocalDate(),
+                        TreeMap::new,
+                        Collectors.toList()
+                ));
+    }
+
 }

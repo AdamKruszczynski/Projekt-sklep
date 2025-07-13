@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Panel użytkownika</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<div>
+  <h2>Witaj w panelu użytkownika!</h2>
+</div>
+
+<a th:href="@{/user/account}">Moje konto</a>
+
+<div>
+  <h3>Zapisane koszyki:</h3>
+  <a th:href="@{/cart/saved}">Przeglądaj zapisane koszyki</a>
+</div>
+
+<div>
+  <h3>Historia zamówień:</h3>
+  <a th:href="@{/order/history}">Zobacz historię zamówień</a>
+</div>
+
+<div>
+  <h3>Kalendarz:</h3>
+  <a th:href="@{/order/schedule}">🗓️ Terminarz zamówień</a>
+</div>
+
+</body>
+</html>

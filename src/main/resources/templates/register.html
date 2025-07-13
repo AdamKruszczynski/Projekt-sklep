@@ -3,6 +3,11 @@
 <head><title>Rejestracja</title></head>
 <body>
 <h2>Rejestracja</h2>
+
+<div th:if="${error}" style="color: red;">
+  <p th:text="${error}"></p>
+</div>
+
 <form th:action="@{/register}" th:object="${user}" method="post">
   <label>Login:</label>
   <input type="text" th:field="*{username}" required><br>

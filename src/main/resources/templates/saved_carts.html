@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Zapisane koszyki</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+<h1>Twoje zapisane koszyki</h1>
+
+<!-- Info o limicie -->
+<div th:if="${savedCarts.size() >= 10}">
+  <p style="color:red;">Osiągnąłeś limit 10 zapisanych koszyków.</p>
+</div>
+
+<!-- Lista zapisanych koszyków -->
+<div th:each="cart : ${savedCarts}">
+  <div style="border: 1px solid gray; padding: 10px; margin-bottom: 10px;">
+    <form method="post" th:action="@{/cart/rename}">
+      <input type="hidden" name="cartId" th:value="${cart.id}" />
+      <input type="text" name="name" th:value="${cart.name}" />
+      <button type="submit">✏️ Zmień nazwę</button>
+    </form>
+
+    <form method="post" th:action="@{/cart/load}">
+      <input type="hidden" name="cartId" th:value="${cart.id}" />
+      <button type="submit">📦 Załaduj koszyk</button>
+    </form>
+
+    <form method="post" th:action="@{/cart/delete}">
+      <input type="hidden" name="cartId" th:value="${cart.id}" />
+      <button type="submit" onclick="return confirm('Czy na pewno chcesz usunąć ten koszyk?')">🗑️ Usuń koszyk</button>
+    </form>
+
+    <h4>Produkty:</h4>
+    <ul>
+      <li th:each="item : ${cart.items}">
+        <span th:text="${item.product.name}">Nazwa</span>
+        <span> x </span>
+        <span th:text="${item.quantity}">Ilość</span>
+
+        <!-- Usuń pojedynczy produkt -->
+        <form method="post" th:action="@{/cart/saved/remove-product}" style="display:inline;">
+          <input type="hidden" name="cartId" th:value="${cart.id}" />
+          <input type="hidden" name="productId" th:value="${item.product.id}" />
+          <button type="submit">❌</button>
+        </form>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Powrót -->
+<a href="/cart/view">← Wróć do koszyka</a>
+</body>
+</html>

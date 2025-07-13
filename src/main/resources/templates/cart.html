@@ -11,6 +11,10 @@
 <body>
 <h1>Twój koszyk</h1>
 
+<div th:if="${error}" class="error-message" style="color:red; font-weight: bold;">
+  <p th:text="${error}"></p>
+</div>
+
 <table>
   <thead>
   <tr>
@@ -40,14 +44,20 @@
       </form>
     </td>
   </tr>
-
   </tbody>
 </table>
 
 <h3>Łączna suma: <span id="totalPrice" th:text="${total}">0.00</span> zł</h3>
 
 <form method="post" th:action="@{/order/submit}">
+  <label for="pickupTime">Wybierz datę i godzinę realizacji zamówienia:</label>
+  <input type="datetime-local" id="pickupTime" name="pickupTime" required th:attr="min=${minDate}">
   <button type="submit">Zamów</button>
+</form>
+
+<form method="post" th:action="@{/cart/save}">
+  <input type="text" name="name" placeholder="Nazwa zapisu" required />
+  <button type="submit">💾 Zapisz koszyk</button>
 </form>
 
 <script>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Moje konto</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<h2>Dane konta</h2>
+
+<p><strong>Nazwa użytkownika:</strong> <span th:text="${user.username}"></span></p>
+<p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+<p><strong>Numer telefonu:</strong> <span th:text="${user.phoneNumber}"></span></p>
+
+<a th:href="@{/user/edit}">Edytuj dane</a>
+
+</body>
+</html>

@@ -5,7 +5,6 @@
     <title>Strona główna</title>
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-<!--    <link rel="stylesheet" th:href="@{/css/style.css}">-->
     <script th:src="@{/js/script.js}" defer></script>
     <style>
         /* Styl banera */
@@ -115,6 +114,13 @@
             </th:block>
             <th:block th:if="${#authorization.expression('hasAuthority(''USER'')')}">
                 | <a href="/cart/view">Koszyk</a>
+                | <a href="/user/user_panel">Panel użytkownika</a>
+            </th:block>
+            <th:block th:if="${#authorization.expression('hasAuthority(''MODERATOR'')')}">
+                | <a href="/moderator/panel">Panel moderatora</a>
+            </th:block>
+            <th:block th:if="${#authorization.expression('hasAuthority(''ADMIN'')')}">
+                | <a href="/admin/panel">Panel administratora</a>
             </th:block>
             <div id="notification-bell" style="position: relative;">
                 <button id="notification-toggle" onclick="toggleDropdown()" style="background: none; border: none; position: relative;">
@@ -125,7 +131,6 @@
                      style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; padding: 10px; width: 300px;">
                     <p><strong>Ostatnie powiadomienia</strong></p>
                     <ul id="notification-list"></ul>
-                    <button id="markAllReadButton" onclick="markAllNotificationsAsRead()">Oznacz wszystkie jako przeczytane</button>
                 </div>
             </div>
         </th:block>
@@ -181,7 +186,6 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Pokaż ukryte wiersze firm (przycisk "Pokaż więcej")
     const btn = document.getElementById("showMoreBtn");
     if (btn) {
         btn.addEventListener("click", () => {
@@ -192,13 +196,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Obsługa dzwoneczka
     const bell = document.getElementById('notification-bell');
     if (bell) {
         bell.addEventListener('click', toggleDropdown);
     }
 
-    // Odśwież licznik nieprzeczytanych na start
     updateNotificationCount();
 });
 
@@ -222,7 +224,6 @@ function toggleDropdown() {
                     list.appendChild(item);
                 });
 
-                // Przycisk: Oznacz wszystkie jako przeczytane
                 const markAllBtn = document.createElement('button');
                 markAllBtn.innerText = 'Oznacz wszystkie jako przeczytane';
                 markAllBtn.style.marginTop = '10px';
@@ -273,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleBtn.addEventListener('click', toggleDropdown);
     }
 
-    updateNotificationCount(); // ← żeby licznik odświeżał się na starcie
+    updateNotificationCount();
 });
 
 document.addEventListener('click', function(event) {

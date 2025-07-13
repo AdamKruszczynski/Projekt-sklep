@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Dodaj moderatora</title>
+</head>
+<body>
+<h2>Dodaj moderatora</h2>
+<form th:action="@{/owner/moderator/form}" method="post">
+  <label for="username">Login:</label>
+  <input type="text" name="username" id="username" required/><br/>
+
+  <label for="password">Hasło:</label>
+  <input type="password" name="password" id="password" required/><br/>
+
+  <button type="submit">Dodaj moderatora</button>
+</form>
+<a th:href="@{/owner/panel}">Wróć do panelu właściciela</a>
+</body>
+</html>

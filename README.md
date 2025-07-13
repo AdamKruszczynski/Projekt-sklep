@@ -37,3 +37,9 @@
 - Filtrowanie produktów po alergenach i cenie
 - Sortowanie produktów według nazwy lub ceny
 - Zapisane koszyki (do 10 na użytkownika)
+
+📄 Licencja
+Projekt edukacyjny – możesz dowolnie go rozwijać, zmieniać i dostosowywać do własnych potrzeb.
+(Bierzcie i kodujcie z tego wszyscy.)
+
+
